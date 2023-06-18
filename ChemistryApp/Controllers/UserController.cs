@@ -68,6 +68,11 @@ public class UserController : ControllerBase
     {
         try
         {
+            if (_entities.Users.Any(u => u.Login == userInfo.Login))
+            {
+                return BadRequest("User with this login already exists");
+            }
+            
             _entities.Users.Add(new User
             {
                 Login = userInfo.Login,

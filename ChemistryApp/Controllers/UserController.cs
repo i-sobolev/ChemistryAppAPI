@@ -25,9 +25,9 @@ public class UserController : ControllerBase
 
     [AllowAnonymous]
     [HttpGet("Authenticate")]
-    public IActionResult Authenticate(string login, string password)
+    public async Task<IActionResult> Authenticate(string login, string password)
     {
-        var token = _tokenManager.Authenticate(login, password);
+        var token = await _tokenManager.Authenticate(login, password);
 
         if (token == null)
         {

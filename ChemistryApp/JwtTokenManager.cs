@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using ChemistryApp.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ChemistryApp;
@@ -16,9 +17,9 @@ public class JwtTokenManager : IJwtTokenManager
         _configuration = configuration;
         _entities = new ChemistryAppContext();
     }
-    public string? Authenticate(string login, string password)
+    public async Task<string?> Authenticate(string login, string password)
     {
-        var user = _entities.Users.FirstOrDefault(u => u.Login == login && u.Password == password);
+        var user = await _entities.Users.FirstOrDefaultAsync(u => u.Login == login && u.Password == password);
         if (user == null)
         {
             return null;

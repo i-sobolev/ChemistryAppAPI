@@ -22,18 +22,34 @@ public class UserCompletedChapterController : ControllerBase
         {
             var userId = User.GetLoggedInUserId<int>();
             
-            _entities.CompletedChapters.Add(new CompletedChapter
-            {
-                Id = completedChapterId
-            });
+            var isChapterExist = await _entities.CompletedChapters
+                .AnyAsync(t => t.Id == completedChapterId);
 
-            _entities.UserCompletedChapters.Add(new UserCompletedChapter
+            if (!isChapterExist)
             {
-                CompletedChapterId = completedChapterId,
-                UserId = userId
-            });
+                _entities.CompletedChapters.Add(new CompletedChapter
+                {
+                    Id = completedChapterId
+                });
+            }
+            
+            var hasUserChapters = await _entities.UserCompletedChapters
+                .AnyAsync(t => t.Id == completedChapterId && t.UserId == userId);
 
-            await _entities.SaveChangesAsync();
+            if (!hasUserChapters)
+            {
+                _entities.UserCompletedChapters.Add(new UserCompletedChapter
+                {
+                    CompletedChapterId = completedChapterId,
+                    UserId = userId
+                });
+            }
+
+            if (!isChapterExist || !hasUserChapters)
+            {
+                await _entities.SaveChangesAsync();
+            }
+
             return Ok();
         }
         catch (Exception ex)

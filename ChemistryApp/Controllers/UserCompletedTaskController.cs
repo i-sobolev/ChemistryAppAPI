@@ -21,19 +21,35 @@ public class UserCompletedTaskController : ControllerBase
         try
         {
             var userId = User.GetLoggedInUserId<int>();
+
+            var isTaskExist = await _entities.CompletedTasks
+                .AnyAsync(t => t.Id == completedTaskId);
+
+            if (!isTaskExist)
+            {
+                _entities.CompletedTasks.Add(new CompletedTask
+                {
+                    Id = completedTaskId
+                });
+            }
+
+            var hasUserTasks = await _entities.UserCompletedTasks
+                .AnyAsync(t => t.Id == completedTaskId && t.UserId == userId);
+
+            if (!hasUserTasks)
+            {
+                _entities.UserCompletedTasks.Add(new UserCompletedTask
+                {
+                    UserId = userId,
+                    CompletedTaskId = completedTaskId
+                });
+            }
+
+            if (!hasUserTasks || !isTaskExist)
+            {
+                await _entities.SaveChangesAsync();
+            }
             
-            _entities.CompletedTasks.Add(new CompletedTask
-            {
-                Id = completedTaskId
-            });
-
-            _entities.UserCompletedTasks.Add(new UserCompletedTask
-            {
-                UserId = userId,
-                CompletedTaskId = completedTaskId
-            });
-
-            await _entities.SaveChangesAsync();
             return Ok();
         }
         catch (Exception ex)

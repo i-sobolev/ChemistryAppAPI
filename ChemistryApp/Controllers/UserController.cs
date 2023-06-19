@@ -89,4 +89,16 @@ public class UserController : ControllerBase
             return BadRequest();
         }
     }
+
+    [Authorize]
+    [HttpGet("GetOtherUsers")]
+    public async Task<IActionResult> GetUsers()
+    {
+        var userId = User.GetLoggedInUserId<int>();
+
+        var friends = await _entities.Users.Where(u => u.Id != userId)
+            .ToListAsync();
+
+        return new ObjectResult(friends);
+    }
 }

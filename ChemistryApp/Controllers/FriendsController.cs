@@ -26,4 +26,28 @@ public class FriendsController : ControllerBase
 
         return new ObjectResult(friends);
     }
+
+    [Authorize]
+    [HttpPost("Add")]
+    public async Task<IActionResult> Post(int friendId)
+    {
+        try
+        {
+            var userId = User.GetLoggedInUserId<int>();
+
+            _entities.Friends.Add(new Friend
+            {
+                UserId = userId,
+                FriendId = friendId
+            });
+
+            await _entities.SaveChangesAsync();
+            return Ok();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex);
+            return BadRequest();
+        }
+    }
 }

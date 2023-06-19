@@ -97,6 +97,11 @@ public class UserController : ControllerBase
         var userId = User.GetLoggedInUserId<int>();
 
         var friends = await _entities.Users.Where(u => u.Id != userId)
+            .Select(u => new UserInfo
+            {
+                Id = u.Id,
+                Name = u.Name
+            })
             .ToListAsync();
 
         return new ObjectResult(friends);

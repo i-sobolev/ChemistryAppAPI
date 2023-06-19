@@ -35,6 +35,13 @@ public class FriendsController : ControllerBase
         {
             var userId = User.GetLoggedInUserId<int>();
 
+            var isRowExist = _entities.Friends.Any(u => u.UserId == userId && u.FriendId == friendId);
+
+            if (isRowExist)
+            {
+                return BadRequest("User already has this friend");
+            }
+
             _entities.Friends.Add(new Friend
             {
                 UserId = userId,
